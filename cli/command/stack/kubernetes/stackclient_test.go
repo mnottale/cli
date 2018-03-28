@@ -7,8 +7,9 @@ import (
 	"github.com/gotestyourself/gotestyourself/assert"
 )
 
-func TestLoadStack(t *testing.T) {
-	s, err := loadStack("foo", composetypes.Config{
+func TestFromCompose(t *testing.T) {
+	stackClient := &stackV1Beta1{}
+	s, err := stackClient.FromCompose("foo", composetypes.Config{
 		Version:  "3.1",
 		Filename: "banana",
 		Services: []composetypes.ServiceConfig{

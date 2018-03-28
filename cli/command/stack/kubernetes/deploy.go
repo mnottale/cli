@@ -16,16 +16,6 @@ func RunDeploy(dockerCli *KubeCli, opts options.Deploy) error {
 		return errors.Errorf("Please specify only one compose file (with --compose-file).")
 	}
 
-	// Parse the compose file
-	cfg, err := loader.LoadComposefile(dockerCli, opts)
-	if err != nil {
-		return err
-	}
-	stack, err := loadStack(opts.Namespace, *cfg)
-	if err != nil {
-		return err
-	}
-
 	// Initialize clients
 	stacks, err := dockerCli.stacks()
 	if err != nil {
@@ -35,6 +25,17 @@ func RunDeploy(dockerCli *KubeCli, opts options.Deploy) error {
 	if err != nil {
 		return err
 	}
+
+	// Parse the compose file
+	cfg, err := loader.LoadComposefile(dockerCli, opts)
+	if err != nil {
+		return err
+	}
+	stack, err := stacks.FromCompose(opts.Namespace, *cfg)
+	if err != nil {
+		return err
+	}
+
 	configMaps := composeClient.ConfigMaps()
 	secrets := composeClient.Secrets()
 	services := composeClient.Services()

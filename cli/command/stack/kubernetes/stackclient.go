@@ -3,9 +3,11 @@ package kubernetes
 import (
 	"fmt"
 
+	composetypes "github.com/docker/cli/cli/compose/types"
 	composev1beta1 "github.com/docker/cli/kubernetes/client/clientset/typed/compose/v1beta1"
 	composev1beta2 "github.com/docker/cli/kubernetes/client/clientset/typed/compose/v1beta2"
 	"github.com/docker/cli/kubernetes/labels"
+	yaml "gopkg.in/yaml.v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
@@ -18,6 +20,7 @@ type stackClient interface {
 	Get(name string) (stack, error)
 	List(opts metav1.ListOptions) ([]stack, error)
 	IsColliding(servicesClient corev1.ServiceInterface, s stack) error
+	FromCompose(name string, cfg composetypes.Config) (stack, error)
 }
 
 // stackV1Beta1 implements stackClient interface and talks to compose component v1beta1.
@@ -100,6 +103,18 @@ func verify(services corev1.ServiceInterface, stackName string, service string) 
 	return nil
 }
 
+func (s *stackV1Beta1) FromCompose(name string, cfg composetypes.Config) (stack, error) {
+	res, err := yaml.Marshal(cfg)
+	if err != nil {
+		return stack{}, err
+	}
+	return stack{
+		name:        name,
+		composeFile: string(res),
+		spec:        fromComposeConfig(&cfg),
+	}, nil
+}
+
 // stackV1Beta2 implements stackClient interface and talks to compose component v1beta2.
 type stackV1Beta2 struct {
 	stacks composev1beta2.StackInterface
@@ -152,4 +167,11 @@ func (s *stackV1Beta2) List(opts metav1.ListOptions) ([]stack, error) {
 // IsColliding is handle server side with the compose api v1beta2, so nothing to do here
 func (s *stackV1Beta2) IsColliding(servicesClient corev1.ServiceInterface, st stack) error {
 	return nil
+}
+
+func (s *stackV1Beta2) FromCompose(name string, cfg composetypes.Config) (stack, error) {
+	return stack{
+		name: name,
+		spec: fromComposeConfig(&cfg),
+	}, nil
 }

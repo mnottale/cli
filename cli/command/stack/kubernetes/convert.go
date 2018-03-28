@@ -5,11 +5,27 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/docker/cli/cli/compose/loader"
 	composeTypes "github.com/docker/cli/cli/compose/types"
+	composetypes "github.com/docker/cli/cli/compose/types"
 	"github.com/docker/cli/kubernetes/compose/v1beta1"
 	"github.com/docker/cli/kubernetes/compose/v1beta2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+func loadStackData(composefile string) (*composetypes.Config, error) {
+	parsed, err := loader.ParseYAML([]byte(composefile))
+	if err != nil {
+		return nil, err
+	}
+	return loader.Load(composetypes.ConfigDetails{
+		ConfigFiles: []composetypes.ConfigFile{
+			{
+				Config: parsed,
+			},
+		},
+	})
+}
 
 // Conversions from internal stack to different stack compose component versions.
 func stackFromV1beta1(in *v1beta1.Stack) (stack, error) {
