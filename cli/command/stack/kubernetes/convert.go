@@ -36,7 +36,7 @@ func stackFromV1beta1(in *v1beta1.Stack) (stack, error) {
 	return stack{
 		name:        in.ObjectMeta.Name,
 		composeFile: in.Spec.ComposeFile,
-		spec:        fromComposeConfig(cfg),
+		spec:        FromComposeConfig(cfg),
 	}, nil
 }
 

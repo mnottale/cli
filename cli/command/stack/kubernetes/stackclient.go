@@ -111,7 +111,7 @@ func (s *stackV1Beta1) FromCompose(name string, cfg composetypes.Config) (stack,
 	return stack{
 		name:        name,
 		composeFile: string(res),
-		spec:        fromComposeConfig(&cfg),
+		spec:        FromComposeConfig(&cfg),
 	}, nil
 }
 
@@ -172,6 +172,6 @@ func (s *stackV1Beta2) IsColliding(servicesClient corev1.ServiceInterface, st st
 func (s *stackV1Beta2) FromCompose(name string, cfg composetypes.Config) (stack, error) {
 	return stack{
 		name: name,
-		spec: fromComposeConfig(&cfg),
+		spec: FromComposeConfig(&cfg),
 	}, nil
 }
