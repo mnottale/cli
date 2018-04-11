@@ -67,7 +67,7 @@ func stackToV1beta2(s stack) *v1beta2.Stack {
 	}
 }
 
-func fromComposeConfig(c *composeTypes.Config) *v1beta2.StackSpec {
+func FromComposeConfig(c *composeTypes.Config) *v1beta2.StackSpec {
 	if c == nil {
 		return nil
 	}
