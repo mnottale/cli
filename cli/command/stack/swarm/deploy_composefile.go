@@ -22,7 +22,11 @@ func deployCompose(ctx context.Context, dockerCli command.Cli, opts options.Depl
 	if err != nil {
 		return err
 	}
+	return DeployCompose(ctx, dockerCli, config, opts)
+}
 
+// DeployCompose deploys the given parsed compose file
+func DeployCompose(ctx context.Context, dockerCli command.Cli, config *composetypes.Config, opts options.Deploy) error {
 	if err := checkDaemonIsSwarmManager(ctx, dockerCli); err != nil {
 		return err
 	}
